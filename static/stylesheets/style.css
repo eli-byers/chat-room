@@ -1,0 +1,73 @@
+body {
+	background-color: #3498db !important;
+	padding: 1em ! important;
+}
+html,body,.container,.body,.board, .users
+{
+    height:100% !important;
+}
+
+.row {
+	background-color: #ecf0f1;
+	box-shadow: 3px 3px 8px #333333;
+	border-radius: .4em;
+	padding: 1.2em 0em;
+	min-height: 250px;
+	min-width: 275px;
+}
+
+.board {
+	padding-right: 0em !important;
+}
+
+.red {
+	color: #e74c3c;
+	font-weight: bold;
+}
+
+.grey {
+	color: #95a5a6;
+	text-align: center;
+}
+
+#user_names {
+	background-color: white;
+	border-radius: .5em;
+	height: 100%;
+	padding: 1.2em;
+	overflow: scroll;
+	border: 1px solid #bdc3c7;
+}
+
+
+#message_board {
+	background-color: white;
+	padding: 1.2em;
+	border-radius: .4em;
+	display: block;
+	border: 1px solid #bdc3c7;
+	overflow: scroll;
+}
+
+.message_area {
+	display: block;
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+	padding-right: 1.1em;
+}
+
+.textarea {
+	position: relative;
+	resize: none;
+	margin-bottom: 10px;
+	border: 1px solid #bdc3c7 !important;
+}
+
+form {
+	margin-bottom: 0px !important;
+}
+
+p {
+	margin-bottom: 0px !important;
+}

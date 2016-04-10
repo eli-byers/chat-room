@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Group Chat</title>
+		<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<!-- Latest compiled and minified CSS -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+		<!-- Latest compiled and minified JavaScript -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+		<script>
+		$(document).ready( function(){
+
+			// board_height
+			var board_height = $('.board').outerHeight(true) - $('.message_area').height() - 10;
+			$('#message_board').outerHeight(board_height);
+			window.onresize = function() {
+				var board_height = $('.board').outerHeight(true) - $('.message_area').height() - 10;
+				$('#message_board').outerHeight(board_height);
+			}
+
+
+			//	On Connection
+			//
+			var socket_id = "";
+			var name = prompt("Please enter your name");
+			if (name != '' && name != null) {
+ 				// do something with the input
+				var socket = io.connect();
+
+				// New User
+				//
+				socket.emit("got_new_user" , {"name": name});
+				socket.on('got_new_user_response', function (data){
+					console.log("got_new_user_response", data.id);
+					socket_id = data.id;
+					users = data.all_users;
+					// fill in users
+					for (i in users){
+						if (users[i].id == socket_id){
+							$("#user_names").append("<p class='red'><b>"+users[i].name+"</b></p>");
+						} else {
+							var id = users[i].id.replace("/#","");
+							$("#user_names").append("<p id='"+id+"'><b>"+users[i].name+"</b></p>");
+						}
+					}
+					// fill in messages
+					messages = data.all_messages;
+					$("#place_holder").remove();
+					for (i in messages){
+						$("#message_board").append("<p><b>"+messages[i].user_name+":</b> "+messages[i].content+"</p>");
+					}
+					$("#message_board").append("<h5 style='text-align: center;'>Welcome to the room <span class='red'>"+name+"</span>!</h5>");
+					scrollToBottom(false);
+				});
+
+				// Updated - Users
+				//
+				socket.on('new_user', function(data){
+					$("#message_board").append("<p class='grey'><b>"+data.name+"</b> joined the room.</p>");
+					scrollToBottom();
+					var user_id = data.id.replace("/#","");
+					$("#user_names").append("<p id='"+user_id+"'><b>"+data.name+"</b></p>");
+				});
+
+				// Updated - Messages
+				//
+				socket.on('new_messages', function(data){
+					$("#message_board").append("<p><b>"+data.user_name+":</b> "+data.content+"</p>");
+					scrollToBottom()
+				});
+
+				// User Left
+				//
+				socket.on('user_left', function(data){
+					var user = data.id.replace("/#","");
+					$("#"+user).remove();
+					$("#message_board").append("<p class='grey'><b>"+data.name+"</b> left the room.</p>");
+					scrollToBottom();
+				});
+			}
+
+
+			// Submit Message
+			//
+			$("#message").submit(function(event){
+				event.preventDefault();
+				var message = $("#message_text").val();
+				if (message != "") {
+					message = {"user_name":name, "content":message};
+					$("#message_text").val("");
+					$("#message_board").append("<p><b class='red'>"+name+":</b> "+message.content+"</p>");
+					scrollToBottom(false);
+					socket.emit("new_message", {"new_message": message});
+				}
+			});
+
+			$(document).keypress(function(event) {
+				if (event.keyCode == 13) {
+					event.preventDefault();
+					$("#message").submit();
+				}
+			});
+
+
+			function scrollToBottom(test = true){
+				if (test) {
+					if($("#message_board").scrollTop() + $("#message_board").innerHeight() >= $("#message_board")[0].scrollHeight - 50) {
+						$("#message_board").animate({ scrollTop: $("#message_board")[0].scrollHeight}, 1000);
+					} else {
+						$("#message_board").css("border", "1px solid #2ecc71");
+						setTimeout( function(){
+							$("#message_board").css("border", "1px solid #bdc3c7");
+						}, 300 );
+					}
+				} else {
+					$("#message_board").animate({ scrollTop: $("#message_board")[0].scrollHeight}, 1000);
+				}
+			}
+
+		});
+		</script>
+
+		<style>
+
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row body">
+				<div class="board col-xs-9 col-md-10">
+					<div id="message_board">
+						<p id='place_holder'></p>
+					</div>
+					<div class="message_area">
+						<form id="message" class="form-group text-right" method="post">
+							<textarea class="textarea form-control" rows="3" id="message_text" ></textarea>
+							<input type="submit" class="submit btn btn-success"></input>
+						</form>
+					</div>
+				</div>
+				<div class="users col-xs-3 col-md-2 text-right">
+					<div id="user_names">
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+	</body>
+</html>
