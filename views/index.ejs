@@ -23,6 +23,7 @@
 				$('#message_board').outerHeight(board_height);
 			}
 
+			$("#message_text").focus();
 
 			//	On Connection
 			//
@@ -42,7 +43,7 @@
 					// fill in users
 					for (i in users){
 						if (users[i].id == socket_id){
-							$("#user_names").append("<p class='red'><b>"+users[i].name+"</b></p>");
+							$("#user_names").append("<p><b><span class='red'>"+users[i].name+"</span></b></p>");
 						} else {
 							var id = users[i].id.replace("/#","");
 							$("#user_names").append("<p id='"+id+"'><b>"+users[i].name+"</b></p>");
@@ -61,17 +62,19 @@
 				// Updated - Users
 				//
 				socket.on('new_user', function(data){
-					$("#message_board").append("<p class='grey'><b>"+data.name+"</b> joined the room.</p>");
+					$("#message_board").append("<p style='text-align: center;'><span class='grey'><b>"+data.name+"</b> joined the room.</span></p>");
 					scrollToBottom();
 					var user_id = data.id.replace("/#","");
 					$("#user_names").append("<p id='"+user_id+"'><b>"+data.name+"</b></p>");
+					check_color();
 				});
 
 				// Updated - Messages
 				//
 				socket.on('new_messages', function(data){
 					$("#message_board").append("<p><b>"+data.user_name+":</b> "+data.content+"</p>");
-					scrollToBottom()
+					scrollToBottom();
+					check_color();
 				});
 
 				// User Left
@@ -79,26 +82,13 @@
 				socket.on('user_left', function(data){
 					var user = data.id.replace("/#","");
 					$("#"+user).remove();
-					$("#message_board").append("<p class='grey'><b>"+data.name+"</b> left the room.</p>");
+					$("#message_board").append("<p style='text-align: center;'><span class='grey'><b>"+data.name+"</b> left the room.</span></p>");
 					scrollToBottom();
 				});
 			}
 
-
-			// Submit Message
+			// Submit on Enter
 			//
-			$("#message").submit(function(event){
-				event.preventDefault();
-				var message = $("#message_text").val();
-				if (message != "") {
-					message = {"user_name":name, "content":message};
-					$("#message_text").val("");
-					$("#message_board").append("<p><b class='red'>"+name+":</b> "+message.content+"</p>");
-					scrollToBottom(false);
-					socket.emit("new_message", {"new_message": message});
-				}
-			});
-
 			$(document).keypress(function(event) {
 				if (event.keyCode == 13) {
 					event.preventDefault();
@@ -106,45 +96,99 @@
 				}
 			});
 
+			// Submit Message
+			//
+			$("#message").submit(function(event){
+				console.log("submit");
+				event.preventDefault();
+				var message = $("#message_text").val();
+				if (message != "") {
+					message = {"user_name":name, "content":message};
+					$("#message_text").val("");
+					$("#message_text").focus();
+					$("#message_board").append("<p><b class='red'>"+name+":</b> "+message.content+"</p>");
+					scrollToBottom(false);
+					check_color();
+					socket.emit("new_message", {"new_message": message});
+				}
+			});
 
+			// Scroll To Bottom
+			//
 			function scrollToBottom(test = true){
 				if (test) {
 					if($("#message_board").scrollTop() + $("#message_board").innerHeight() >= $("#message_board")[0].scrollHeight - 50) {
 						$("#message_board").animate({ scrollTop: $("#message_board")[0].scrollHeight}, 1000);
 					} else {
-						$("#message_board").css("border", "1px solid #2ecc71");
+						$("#message_board").css({
+								"border": "2px solid #2ecc71",
+								"padding": "1.13em"
+						});
 						setTimeout( function(){
-							$("#message_board").css("border", "1px solid #bdc3c7");
-						}, 300 );
+							$("#message_board").css({
+								"border": "1px solid #bdc3c7",
+								"padding": "1.2em"
+							});
+						}, 200 );
 					}
 				} else {
 					$("#message_board").animate({ scrollTop: $("#message_board")[0].scrollHeight}, 1000);
 				}
 			}
 
+			// Night Day
+			//
+			$("#day_night").click(function(){
+				if ($("#day_night").html() == "Dark") {
+					$("#day_night").html("Light");
+				} else {
+					$("#day_night").html("Dark");
+				}
+				check_color();
+				$("#message_text").focus();
+			});
+
+			function check_color(){
+				if ($("#day_night").html() == "Dark"){
+					makeLight();
+				} else {
+					makeDark();
+				}
+			}
+
+			function makeDark() {
+				$(".row").addClass("dark-back");
+				$(".box").addClass('dark-box');
+				$("p").addClass('dark-text');
+				$("h5").addClass('dark-text');
+			}
+
+			function makeLight(){
+				$(".row").removeClass("dark-back");
+				$(".box").removeClass('dark-box');
+				$("p").removeClass('dark-text');
+				$("h5").removeClass('dark-text');
+			}
 		});
 		</script>
-
-		<style>
-
-		</style>
 	</head>
 	<body>
 		<div class="container">
-			<div class="row body">
-				<div class="board col-xs-9 col-md-10">
-					<div id="message_board">
+			<div class="row">
+				<div id="board" class="board col-xs-9 col-md-10">
+					<div id="message_board" class='box'>
 						<p id='place_holder'></p>
 					</div>
 					<div class="message_area">
-						<form id="message" class="form-group text-right" method="post">
-							<textarea class="textarea form-control" rows="3" id="message_text" ></textarea>
-							<input type="submit" class="submit btn btn-success"></input>
+						<form id="message" class="form-group" method="post">
+							<textarea class="textarea box form-control" rows="3" id="message_text" ></textarea>
+							<button id="day_night" type='button' class="btn">Dark</button>
+							<input type="submit" class="submit btn btn-success pull-right"></input>
 						</form>
 					</div>
 				</div>
 				<div class="users col-xs-3 col-md-2 text-right">
-					<div id="user_names">
+					<div id="user_names" class="box">
 
 					</div>
 				</div>

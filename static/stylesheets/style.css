@@ -2,7 +2,7 @@ body {
 	background-color: #3498db !important;
 	padding: 1em ! important;
 }
-html,body,.container,.body,.board, .users
+html,body,.container,.row, .board, .users
 {
     height:100% !important;
 }
@@ -31,21 +31,17 @@ html,body,.container,.body,.board, .users
 }
 
 #user_names {
-	background-color: white;
 	border-radius: .5em;
 	height: 100%;
 	padding: 1.2em;
 	overflow: scroll;
-	border: 1px solid #bdc3c7;
 }
 
 
 #message_board {
-	background-color: white;
 	padding: 1.2em;
 	border-radius: .4em;
 	display: block;
-	border: 1px solid #bdc3c7;
 	overflow: scroll;
 }
 
@@ -61,13 +57,28 @@ html,body,.container,.body,.board, .users
 	position: relative;
 	resize: none;
 	margin-bottom: 10px;
-	border: 1px solid #bdc3c7 !important;
+	border: 1px solid #bdc3c7;
 }
 
-form {
-	margin-bottom: 0px !important;
+			/*color*/
+.box {
+	background-color: white;
+	border: 1px solid #bdc3c7;
+	color: black;
+}
+.dark-box {
+	background-color: #262626 !important;
+	border: 1px solid #262626 !important;
+	color: #ecf0f1 !important;
+}
+.dark-text {
+	color: #ecf0f1 !important;
+}
+.dark-back {
+	background-color: #404040 !important;
 }
 
-p {
+			/*no padding*/
+form, p {
 	margin-bottom: 0px !important;
 }
