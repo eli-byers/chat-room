@@ -67,28 +67,24 @@ html,body,.container,.row, .board, .users
 	color: black;
 }
 
-.dark-box {
-	background-color: #262626 !important;
-	border: 1px solid #262626 !important;
-	color: #ecf0f1 !important;
-}
-
 .message-board {
 	background-color: white;
 	border: 1px solid #bdc3c7;
 	color: black;
 }
 
-.dark-board {
+.dark .box,
+.dark .button, 
+.dark #message_board {
 	background-color: #262626 !important;
-	border: 1px solid #262626;
-}
-
-
-.dark-text {
+	border: 1px solid #262626 !important;
 	color: #ecf0f1 !important;
 }
-.dark-back {
+.dark p,
+.dark h5 {
+	color: #ecf0f1 !important;
+}
+.dark .row {
 	background-color: #404040 !important;
 }
 
